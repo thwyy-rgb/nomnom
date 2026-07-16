@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NomNom - Khám Phá Ẩm Thực</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="header-left">
+        <div class="logo" id="logoBtn">Nom<span>Nom</span></div>
+        <div class="search-container">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Tìm công thức, món ăn, quán ngon..."
+          />
+          <button class="btn-search"><i class="fas fa-search"></i></button>
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="btn-add-post" id="openAddModalBtn" style="display: none">
+          <i class="fas fa-plus"></i> Chia sẻ bài viết
+        </button>
+
+        <div class="user-auth-area" id="userAuthArea">
+          <button id="loginBtn" class="btn-login" style="display: none">
+            <i class="fas fa-sign-in-alt"></i> Đăng nhập
+          </button>
+
+          <div class="user-info" id="userInfo" style="display: none">
+            <img src="" alt="Avatar" id="userAvatar" />
+            <span id="userName">Người dùng</span>
+            <button id="logoutBtn" class="btn-logout" title="Đăng xuất">
+              <i class="fas fa-sign-out-alt"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-layout">
+      <aside class="left-sidebar">
+        <nav class="sidebar-menu">
+          <a href="#" class="sidebar-item active" data-page="explore">
+            <i class="fas fa-compass"></i>
+            <span>Khám phá</span>
+          </a>
+          <a href="#" class="sidebar-item" data-page="home">
+            <i class="fas fa-home"></i>
+            <span>Trang chủ</span>
+          </a>
+          <a href="#" class="sidebar-item" data-page="saved">
+            <i class="fas fa-bookmark"></i>
+            <span>Đã lưu</span>
+          </a>
+        </nav>
+      </aside>
+
+      <main class="main-content-area" id="mainContentWindow">
+        <section class="page-view active" id="page-explore">
+          <nav class="filter-nav">
+            <a href="#" class="nav-item active" data-filter="all">Tất cả bài viết</a>
+            <a href="#" class="nav-item" data-filter="recipe">Công thức nấu ăn</a>
+            <a href="#" class="nav-item" data-filter="review">Review quán ngon</a>
+            <a href="#" class="nav-item" id="myPostsTab" data-filter="mine" style="display: none">Bài viết của tôi</a>
+          </nav>
+
+          <div class="posts-grid" id="postsContainer">
+            <div class="skeleton-loading">Đang tải dữ liệu bài viết...</div>
+          </div>
+        </section>
+
+        <section class="page-view" id="page-home">
+          <div class="empty-state">
+            <i class="fas fa-home"></i>
+            <h2>Đây là nội dung của Trang Chủ</h2>
+          </div>
+        </section>
+        <section class="page-view" id="page-saved">
+          <div class="empty-state">
+            <i class="fas fa-bookmark"></i>
+            <h2>Bài viết bạn đã lưu sẽ hiển thị ở đây</h2>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="modal-overlay" id="foodModal" style="display: none">
+      <div class="modal-box" style="max-height: 90vh; overflow-y: auto;">
+        <div class="modal-header">
+          <h2 id="modalTitle">Chia Sẻ Bài Viết Mới</h2>
+          <button class="btn-close-modal" id="closeModalBtn">&times;</button>
+        </div>
+        <form id="foodForm">
+          <input type="hidden" id="postId" />
+
+          <div class="form-group">
+            <label for="postType">Phân loại bài đăng:</label>
+            <select id="postType">
+              <option value="recipe">Công thức nấu ăn (Nấu gì đây?)</option>
+              <option value="review">Review quán ăn (Ăn ở đâu?)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="foodName" id="lblFoodName">Tên món ăn:</label>
+            <input type="text" id="foodName" required placeholder="Nhập tên..." />
+          </div>
+
+          <div id="recipeTimeGroup" style="display: flex; gap: 10px;">
+            <div class="form-group" style="flex: 1;">
+              <label>Chuẩn bị (phút):</label>
+              <input type="number" id="prepTime" placeholder="Ví dụ: 30" />
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label>Chế biến (phút):</label>
+              <input type="number" id="cookTime" placeholder="Ví dụ: 20" />
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label>Khẩu phần (người):</label>
+              <input type="text" id="servingSize" placeholder="Ví dụ: 3 - 4 người" />
+            </div>
+          </div>
+
+          <div class="form-group" id="dynamicFieldGroup">
+            <label for="dynamicInput" id="lblDynamic">Nguyên liệu chính (Cách nhau bởi dấu phẩy):</label>
+            <textarea id="dynamicInput" required placeholder="Ví dụ: 300g thịt ba rọi, 150g dứa, 2 trái ớt..." rows="2"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="foodImageFile">Hình ảnh thành phẩm:</label>
+            <input type="file" id="foodImageFile" accept="image/*" />
+            <input type="hidden" id="foodImageUrl" /> 
+            <div id="uploadStatus" style="font-size: 12px; color: #718093; margin-top: 4px;"></div>
+            <img id="imagePreview" src="" style="max-height: 120px; object-fit: cover; border-radius: 6px; display: none; margin-top: 8px;" />
+          </div>
+
+          <div class="form-group">
+            <label for="foodVideoUrl">Link video thành phẩm (YouTube, TikTok,... nếu có):</label>
+            <input type="url" id="foodVideoUrl" placeholder="https://www.youtube.com/watch?v=..." />
+          </div>
+
+          <div class="form-group">
+            <label for="foodContent" id="lblContent">Mô tả ngắn về món ăn:</label>
+            <textarea id="foodContent" rows="3" required placeholder="Nêu cảm nghĩ hoặc mô tả sơ lược về món ăn của bạn..."></textarea>
+          </div>
+
+          <div id="recipeStepsSection" style="margin-top: 10px;">
+            <label style="font-size: 13.5px; font-weight: 600; display: block; margin-bottom: 8px;">Cách làm từng bước:</label>
+            <div id="stepsContainerList" style="display: flex; flex-direction: column; gap: 12px;">
+             
+            </div>
+            <button type="button" id="btnAddStep" style="margin-top: 10px; background: #eaedf1; border: 1px dashed #ced4da; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%; text-align: center; color: #57606f;">
+              <i class="fas fa-plus"></i> Thêm bước thực hiện
+            </button>
+          </div>
+
+          <button type="submit" class="btn-submit" id="saveBtn" style="margin-top: 15px;">
+            Đăng bài viết
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

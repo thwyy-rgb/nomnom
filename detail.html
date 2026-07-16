@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi Tiết Món Ăn - NomNom</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body style="background-color: var(--bg-light);">
+
+    <header class="main-header">
+        <div class="header-left">
+            <div class="logo" id="logoBtn" onclick="window.location.href='main.html'">Nom<span>Nom</span></div>
+        </div>
+        <div class="header-right">
+            <button class="btn-login" onclick="window.location.href='main.html'">
+                <i class="fas fa-arrow-left"></i> Quay lại trang chủ
+            </button>
+        </div>
+    </header>
+
+    <div style="max-width: 800px; margin: 40px auto; padding: 0 20px;">
+        <div style="background: #fff; padding: 30px; border-radius: 12px; box-shadow: var(--shadow-sm);">
+            <div id="viewPostDetailArea">
+                <div style="text-align: center; padding: 40px 0; color: #718093;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 30px; margin-bottom: 10px;"></i>
+                    <p>Đang tải chi tiết món ăn ngon...</p>
+                </div>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid #eaedf1; margin: 30px 0;">
+
+            <h4 style="font-size: 18px; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                <i class="far fa-comments"></i> Bình luận (<span id="commentCount">0</span>)
+            </h4>
+            
+            <div id="commentsList" style="margin: 20px 0; display: flex; flex-direction: column; gap: 12px;"></div>
+
+            <div id="commentAuthWarning" style="display: none; text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px; font-size: 14px; color: #57606f;">
+                Bạn cần <a href="login.html" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">Đăng nhập</a> để viết bình luận.
+            </div>
+
+            <form id="commentForm" style="display: none; gap: 10px; margin-top: 20px">
+                <input type="hidden" id="editingCommentId" value="" />
+                <input type="text" id="commentInput" required placeholder="Viết bình luận của bạn..." style="flex: 1; padding: 12px 18px; border: 1px solid #dcdde1; border-radius: 24px; outline: none; font-size: 14px;" />
+                <button type="submit" id="submitCommentBtn" style="background: var(--primary-color); color: white; border: none; padding: 0 24px; border-radius: 24px; cursor: pointer; font-weight: 600; font-size: 14px;">Gửi</button>
+                <button type="button" id="cancelEditCommentBtn" style="display: none; background: #ced6e0; color: #2f3542; border: none; padding: 0 12px; border-radius: 24px; cursor: pointer; font-size: 13px;">Hủy</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script type="module" src="detail.js"></script>
+</body>
+</html>

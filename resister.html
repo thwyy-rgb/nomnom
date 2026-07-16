@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nom Nom - Đăng Ký Tài Khoản</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="register.css" />
+  </head>
+  <body>
+    <div class="auth-page-container">
+      <div class="auth-side-bg">
+        <div class="auth-bg-content">
+          <h1>Nom<span>Nom</span></h1>
+          <p>
+            Khám phá hàng ngàn công thức nấu ăn độc đáo và những địa điểm ăn
+            uống cực chất.
+          </p>
+        </div>
+      </div>
+
+      <div class="auth-side-form">
+        <div class="auth-box">
+          <h2>Tạo tài khoản mới</h2>
+          <p class="subtitle">Trở thành thành viên của cộng đồng Nom Nom.</p>
+
+          <form id="emailRegisterForm">
+            <div class="auth-input-group">
+              <label>Tên hiển thị</label>
+              <div class="auth-input-wrapper">
+                <i class="fas fa-user"></i>
+                <input
+                  type="text"
+                  id="regName"
+                  required
+                  placeholder="Ví dụ: Zin Zin"
+                />
+              </div>
+            </div>
+            <div class="auth-input-group">
+              <label>Địa chỉ Email</label>
+              <div class="auth-input-wrapper">
+                <i class="fas fa-envelope"></i>
+                <input
+                  type="email"
+                  id="regEmail"
+                  required
+                  placeholder="name@example.com"
+                />
+              </div>
+            </div>
+            <div class="auth-input-group">
+              <label>Mật khẩu</label>
+              <div class="auth-input-wrapper">
+                <i class="fas fa-lock"></i>
+                <input
+                  type="password"
+                  id="regPassword"
+                  required
+                  placeholder="Tối thiểu 6 ký tự"
+                />
+              </div>
+            </div>
+            <button
+              type="submit"
+              class="btn-submit auth-btn btn-register-color"
+            >
+              Đăng Ký Tài Khoản
+            </button>
+          </form>
+
+          <p class="auth-switch-text">
+            Bạn đã có tài khoản? <a href="login.html">Đăng nhập ngay</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script type="module" src="register.js"></script>
+  </body>
+</html>

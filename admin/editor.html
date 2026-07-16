@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NomNom - Trình Soạn Thảo CMS</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .editor-layout { max-width: 800px; margin: 40px auto; padding: 20px; background: #fff; border-radius: 12px; box-shadow: var(--shadow-md); }
+    .editor-header-fields input, .editor-header-fields select { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 15px; outline: none; }
+    .editor-controls-bar { display: flex; gap: 8px; padding: 10px; background: #f8f9fa; border-radius: 8px; margin: 20px 0; flex-wrap: wrap; }
+    .btn-control { background: #fff; border: 1px solid #ddd; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; }
+    .btn-control:hover { background: #f1f2f6; }
+    .editor-block-wrapper { position: relative; border: 1px dashed #e1e1e1; padding: 16px; margin-bottom: 12px; border-radius: 8px; }
+    .block-controls { display: flex; justify-content: space-between; font-size: 11px; color: #aaa; margin-bottom: 8px; font-weight: bold; text-transform: uppercase; }
+    .btn-delete-block { background: none; border: none; color: #be2c2c; cursor: pointer; font-weight: bold; }
+    .block-input { width: 100%; padding: 8px; border: 1px solid #eee; border-radius: 4px; outline: none; font-size: 15px; }
+  </style>
+</head>
+<body style="background: #f1f2f6;">
+
+  <header class="main-header">
+    <div class="logo" onclick="window.location.href='../main.html'">Nom<span>Nom</span></div>
+    <div>
+      <button id="btnSaveDraft" class="btn-login" style="margin-right: 10px;">Lưu nháp</button>
+      <button id="btnPublish" class="btn-add-post">Công bố bài viết</button>
+    </div>
+  </header>
+
+  <div class="editor-layout">
+    <h2>Trình soạn thảo bài viết</h2>
+    <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+    
+    <div class="editor-header-fields">
+      <input type="text" id="postTitle" placeholder="Tiêu đề bài viết (Ví dụ: Cách nướng sườn ngon...)" required>
+      <input type="text" id="postSummary" placeholder="Mô tả ngắn tóm tắt bài viết..." required>
+      <input type="url" id="postThumbnail" placeholder="Dán link URL ảnh đại diện bài viết (Thumbnail)..." required>
+      
+      <select id="postCategory">
+        <option value="recipe">Công thức nấu ăn</option>
+        <option value="review">Review quán ăn ngon</option>
+      </select>
+    </div>
+
+    <!-- Thanh công cụ thêm Block -->
+    <div class="editor-controls-bar">
+      <span style="align-self: center; font-size: 13px; font-weight: bold; color: #57606f; margin-right: 10px;">Thêm khối nội dung:</span>
+      <button class="btn-control" onclick="addBlock('paragraph')"><i class="fas fa-paragraph"></i> Đoạn văn</button>
+      <button class="btn-control" onclick="addBlock('heading')"><i class="fas fa-heading"></i> Tiêu đề phụ</button>
+      <button class="btn-control" onclick="addBlock('image')"><i class="fas fa-image"></i> Hình ảnh</button>
+      <button class="btn-control" onclick="addBlock('quote')"><i class="fas fa-quote-left"></i> Trích dẫn</button>
+      <button class="btn-control" onclick="addBlock('divider')"><i class="fas fa-minus"></i> Đường kẻ</button>
+    </div>
+
+    <div id="editorContainer">
+      <!-- Các block nội dung do JS chèn vào đây -->
+    </div>
+  </div>
+
+  <script type="module" src="editor.js"></script>
+</body>
+</html>

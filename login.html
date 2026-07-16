@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nom Nom - Đăng Nhập</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="login.css" />
+  </head>
+  <body>
+    <div class="auth-page-container">
+      <div class="auth-side-bg">
+        <div class="auth-bg-content">
+          <h1>Nom<span>Nom</span></h1>
+          <p>
+            Khám phá hàng ngàn công thức nấu ăn độc đáo và những địa điểm ăn
+            uống cực chất từ cộng đồng tinh hoa ẩm thực.
+          </p>
+        </div>
+      </div>
+
+      <div class="auth-side-form">
+        <div class="auth-box">
+          <h2>Mừng bạn quay trở lại!</h2>
+          <p class="subtitle">
+            Vui lòng điền thông tin để đăng nhập tài khoản.
+          </p>
+
+          <form id="emailLoginForm">
+            <div class="auth-input-group">
+              <label>Địa chỉ Email</label>
+              <div class="auth-input-wrapper">
+                <i class="fas fa-envelope"></i>
+                <input
+                  type="email"
+                  id="loginEmail"
+                  required
+                  placeholder="name@example.com"
+                />
+              </div>
+            </div>
+            <div class="auth-input-group">
+              <label>Mật khẩu</label>
+              <div class="auth-input-wrapper">
+                <i class="fas fa-lock"></i>
+                <input
+                  type="password"
+                  id="loginPassword"
+                  required
+                  placeholder="••••••••"
+                />
+              </div>
+            </div>
+            <button type="submit" class="btn-submit auth-btn">Đăng Nhập</button>
+          </form>
+
+          <div class="auth-divider">HOẶC</div>
+
+          <button id="googleAuthBtn" class="btn-google-login">
+            <i class="fab fa-google"></i> Tiếp tục với Google
+          </button>
+
+          <p class="auth-switch-text">
+            Bạn chưa có tài khoản? <a href="resister.html">Đăng ký ngay</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script type="module" src="login.js"></script>
+  </body>
+</html>
