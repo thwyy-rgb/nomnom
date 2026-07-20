@@ -62,7 +62,7 @@ if (emailRegisterForm) {
       showToast("Tạo tài khoản thành công! Đang vào trang chủ...", "success");
 
       setTimeout(() => {
-        window.location.href = "main.html";
+        window.location.href = "index.html";
       }, 1200);
     } catch (err) {
       console.error("Lỗi đăng ký:", err);

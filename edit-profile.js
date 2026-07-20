@@ -1,0 +1,117 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  updateProfile,
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDQCed1Led55t9s8deU1BZSpkVe1oSt-oU",
+  authDomain: "nomnom-42f0b.firebaseapp.com",
+  projectId: "nomnom-42f0b",
+  storageBucket: "nomnom-42f0b.firebasestorage.app",
+  messagingSenderId: "1011885827413",
+  appId: "1:1011885827413:web:56a91e6298d8f219dc7bdc",
+  measurementId: "G-75C54T7XFC",
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+const CLOUDINARY_CLOUD_NAME = "dnurk6t58";
+const CLOUDINARY_UPLOAD_PRESET = "uniqblfi";
+
+// Sửa lại đúng ID khớp với file HTML của bạn
+const profileLoading = document.getElementById("profileLoading"); 
+const profileForm = document.getElementById("editProfileForm"); 
+const editNameInput = document.getElementById("editDisplayName");
+const editAvatarInput = document.getElementById("editAvatarUrl");
+const avatarPreview = document.getElementById("avatarPreview");
+const avatarFileInput = document.getElementById("avatarFileInput");
+const uploadStatus = document.getElementById("uploadStatus");
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    window.location.href = "login.html";
+  } else {
+    if (editNameInput) editNameInput.value = user.displayName || "";
+    if (editAvatarInput) editAvatarInput.value = user.photoURL || "";
+    if (avatarPreview) {
+      avatarPreview.src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+    }
+
+    // Ẩn loading và hiển thị Form
+    if (profileLoading) profileLoading.style.display = "none";
+    if (profileForm) profileForm.style.display = "block";
+  }
+});
+
+// Xử lý khi nhập link ảnh trực tiếp
+if (editAvatarInput) {
+  editAvatarInput.addEventListener("input", (e) => {
+    const url = e.target.value.trim();
+    if (url && avatarPreview) {
+      avatarPreview.src = url;
+    }
+  });
+}
+
+// Xử lý upload ảnh từ máy lên Cloudinary
+if (avatarFileInput) {
+  avatarFileInput.addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (uploadStatus) {
+      uploadStatus.innerText = "Đang tải ảnh...";
+      uploadStatus.style.color = "#27ae60";
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+    try {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+
+      if (data.secure_url) {
+        if (editAvatarInput) editAvatarInput.value = data.secure_url;
+        if (avatarPreview) avatarPreview.src = data.secure_url;
+        if (uploadStatus) {
+          uploadStatus.innerText = "Tải ảnh thành công!";
+          uploadStatus.style.color = "#2ecc71";
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      if (uploadStatus) {
+        uploadStatus.innerText = "Lỗi tải ảnh!";
+        uploadStatus.style.color = "#ff4d4f";
+      }
+    }
+  });
+}
+
+// Submit Form lưu thông tin
+if (profileForm) {
+  profileForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!auth.currentUser) return;
+
+    try {
+      await updateProfile(auth.currentUser, {
+        displayName: editNameInput.value.trim(),
+        photoURL: editAvatarInput.value.trim(),
+      });
+      alert("Cập nhật trang cá nhân thành công!");
+      window.location.href = "index.html";
+    } catch (err) {
+      console.error(err);
+      alert("Không thể cập nhật hồ sơ!");
+    }
+  });
+}

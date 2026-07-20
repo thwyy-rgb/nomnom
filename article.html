@@ -36,8 +36,6 @@
       </div>
 
       <img id="articleHeroImage" class="article-hero-thumb" src="" alt="Thumbnail" style="display: none;">
-
-      <!-- Vùng render động toàn bộ block nội dung soạn thảo -->
       <div id="articleContent"></div>
     </article>
   </main>
@@ -99,7 +97,6 @@
       const contentContainer = document.getElementById('articleContent');
       contentContainer.innerHTML = '';
 
-      // Vòng lặp kết xuất từng Block dữ liệu
       post.blocks.forEach(block => {
         const element = createHtmlFromBlock(block);
         if (element) {

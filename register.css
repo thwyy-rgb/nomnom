@@ -125,11 +125,9 @@ body:has(#emailRegisterForm) .auth-side-bg {
   border-radius: 8px;
   font-size: 15px;
 }
-.btn-register-color {
-  background-color: var(--recipe-color) !important;
-}
+
 .btn-register-color:hover {
-  background-color: #219653 !important;
+  background-color: #ff4757 !important;
 }
 
 .auth-divider {

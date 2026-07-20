@@ -1,7 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import {
   getAuth,
-  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
+  onAuthStateChanged,
   GoogleAuthProvider,
   signInWithEmailAndPassword,
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -20,6 +22,10 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
+provider.setCustomParameters({
+  prompt: "select_account",
+});
+
 const emailLoginForm = document.getElementById("emailLoginForm");
 const googleAuthBtn = document.getElementById("googleAuthBtn");
 
@@ -33,6 +39,28 @@ function showToast(message, type = "success") {
   setTimeout(() => toast.remove(), 3000);
 }
 
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    window.location.href = "index.html";
+  }
+});
+
+getRedirectResult(auth)
+  .then((result) => {
+    if (result && result.user) {
+      showToast("Đăng nhập Google thành công!", "success");
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 500);
+    }
+  })
+  .catch((err) => {
+    console.error("Lỗi Google Auth Redirect:", err);
+    if (err.code !== "auth/credential-already-in-use") {
+      showToast("Đăng nhập bằng Google thất bại!", "danger");
+    }
+  });
+
 if (emailLoginForm) {
   emailLoginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -43,8 +71,8 @@ if (emailLoginForm) {
       await signInWithEmailAndPassword(auth, email, password);
       showToast("Đăng nhập thành công!", "success");
       setTimeout(() => {
-        window.location.href = "main.html";
-      }, 1000);
+        window.location.href = "index.html";
+      }, 500);
     } catch (err) {
       console.error("Lỗi đăng nhập:", err);
       showToast("Sai tài khoản hoặc mật khẩu, vui lòng thử lại!", "danger");
@@ -53,16 +81,7 @@ if (emailLoginForm) {
 }
 
 if (googleAuthBtn) {
-  googleAuthBtn.addEventListener("click", async () => {
-    try {
-      await signInWithPopup(auth, provider);
-      showToast("Đăng nhập Google thành công!", "success");
-      setTimeout(() => {
-        window.location.href = "main.html";
-      }, 1000);
-    } catch (err) {
-      console.error("Lỗi Google Auth:", err);
-      showToast("Đăng nhập bằng Google thất bại hoặc bị hủy!", "danger");
-    }
+  googleAuthBtn.addEventListener("click", () => {
+    signInWithRedirect(auth, provider);
   });
 }

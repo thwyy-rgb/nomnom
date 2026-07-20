@@ -48,7 +48,7 @@ onAuthStateChanged(auth, (user) => {
     document.getElementById("commentForm").style.display = "none";
     document.getElementById("commentAuthWarning").style.display = "block";
   }
-  
+
   if (activePostId) {
     loadPostDetail(activePostId);
     listenToComments(activePostId);
@@ -64,10 +64,11 @@ onAuthStateChanged(auth, (user) => {
 // Hàm hỗ trợ render Video (nhúng Iframe YouTube hoặc hiện nút bấm link ngoài)
 function renderVideoElement(videoUrl) {
   if (!videoUrl) return "";
-  
-  const youtubeRegExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+
+  const youtubeRegExp =
+    /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
   const match = videoUrl.match(youtubeRegExp);
-  
+
   if (match && match[2].length === 11) {
     const videoId = match[2];
     return `
@@ -78,7 +79,7 @@ function renderVideoElement(videoUrl) {
       </div>
     `;
   }
-  
+
   return `
     <div style="margin-top: 10px;">
       <a href="${videoUrl}" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; background: #3498db; color: white; text-decoration: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600;">
@@ -94,33 +95,51 @@ async function loadPostDetail(postId) {
     const postSnap = await getDoc(postRef);
 
     if (!postSnap.exists()) {
-      document.getElementById("viewPostDetailArea").innerHTML = `<p style="color:red; text-align:center;">Bài viết không tồn tại!</p>`;
+      document.getElementById("viewPostDetailArea").innerHTML =
+        `<p style="color:red; text-align:center;">Bài viết không tồn tại!</p>`;
       return;
     }
 
     const post = postSnap.data();
     document.title = `${post.foodName} - NomNom`;
 
+    // Kiểm tra chính chủ bài viết
+    const isPostOwner = post.userId === currentUser?.uid;
+
+    // Ưu tiên thông tin Auth nếu là tác giả bài viết
+    const authorAvatar = isPostOwner
+      ? currentUser?.photoURL ||
+        "https://cdn-icons-png.flaticon.com/512/3177/3177440.png"
+      : post.userAvatar ||
+        "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+
+    const authorName = isPostOwner
+      ? currentUser?.displayName || "Thành viên"
+      : post.userName || "Thành viên";
+
     let detailHTML = `
-      <h1 style="font-size: 26px; font-weight: 800; color: #1e272e; margin-bottom: 12px;">${post.foodName}</h1>
-      <div style="display:flex; align-items:center; gap:10px; margin-bottom: 20px;">
-        <img src="${post.userAvatar || 'https://cdn-icons-png.flaticon.com/512/3177/3177440.png'}" style="width:36px; height:36px; border-radius:50%; object-fit:cover;">
+      <h1 style="font-size: 24px; font-weight: 800; color: #1e272e; margin-bottom: 12px;">${post.foodName}</h1>
+      <div id="postAuthorInfo" style="display:flex; align-items:center; gap:10px; margin-bottom: 16px; ${isPostOwner ? "cursor:pointer;" : ""}" title="${isPostOwner ? "Bấm để chỉnh sửa trang cá nhân" : ""}">
+        <img src="${authorAvatar}" class="author-avatar">
         <div>
-            <div style="font-weight:700; font-size:14px; color:#2f3542;">Đăng bởi: ${post.userName}</div>
-            <div style="font-size:12px; color:#718093;">Phân loại: ${post.postType === 'recipe' ? 'Công thức nấu ăn' : 'Review quán ăn'}</div>
+            <div style="font-weight:700; font-size:14px; color:#2f3542;">Đăng bởi: ${authorName}</div>
+            <div style="font-size:12px; color:#718093;">Phân loại: ${post.postType === "recipe" ? "Công thức nấu ăn" : "Review quán ăn"}</div>
         </div>
       </div>
-      <img src="${post.foodImageUrl || 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?q=80&w=600'}" class="detail-banner" style="width:100%; max-height:450px; object-fit:cover; border-radius:12px;">
+      <img src="${post.foodImageUrl || "https://images.unsplash.com/photo-1498837167922-ddd27525d352?q=80&w=600"}" class="detail-banner">
       
       <!-- Video thành phẩm (nếu có) -->
-      ${post.foodVideoUrl ? `
+      ${
+        post.foodVideoUrl
+          ? `
         <div style="margin-top: 20px;">
           <h4 style="font-size: 15px; font-weight: 700; color: #2d3436; margin-bottom: 8px;"><i class="fas fa-video" style="color: #be2c2c;"></i> Video thành phẩm thực tế:</h4>
           ${renderVideoElement(post.foodVideoUrl)}
         </div>
-      ` : ""}
+      `
+          : ""
+      }
     `;
-
     if (post.postType === "recipe") {
       detailHTML += `
         <div class="time-meta-box">
@@ -139,12 +158,14 @@ async function loadPostDetail(postId) {
         </div>
       `;
 
-      const ingredientsArray = post.dynamicInput ? post.dynamicInput.split(",") : [];
+      const ingredientsArray = post.dynamicInput
+        ? post.dynamicInput.split(",")
+        : [];
       detailHTML += `
         <div class="ingredients-card">
           <h4>Nguyên liệu cần có:</h4>
           <ul class="ingredients-list">
-            ${ingredientsArray.map(ing => `<li>${ing.trim()}</li>`).join("")}
+            ${ingredientsArray.map((ing) => `<li>${ing.trim()}</li>`).join("")}
           </ul>
         </div>
       `;
@@ -169,29 +190,43 @@ async function loadPostDetail(postId) {
       detailHTML += `
         <h4 style="font-size:17px; font-weight:700; margin-bottom:15px; color:#1e272e; border-left:4px solid #2ecc71; padding-left:10px;">Các bước chế biến món ăn:</h4>
         <div class="steps-container">
-          ${post.steps.map((step, idx) => {
-            const stepText = typeof step === "object" ? step.text : step;
-            const stepVideo = typeof step === "object" ? step.video : "";
-            
-            return `
+          ${post.steps
+            .map((step, idx) => {
+              const stepText = typeof step === "object" ? step.text : step;
+              const stepVideo = typeof step === "object" ? step.video : "";
+
+              return `
               <div class="step-card-detail" style="display: flex; flex-direction: column; gap: 8px;">
                 <div style="display: flex; gap: 15px; align-items: flex-start;">
                   <span class="step-badge">Bước ${idx + 1}</span>
                   <div class="step-content-detail" style="flex: 1;">${stepText}</div>
                 </div>
-                ${stepVideo ? `
+                ${
+                  stepVideo
+                    ? `
                   <div style="padding-left: 70px; width: 100%;">
                     ${renderVideoElement(stepVideo)}
                   </div>
-                ` : ""}
+                `
+                    : ""
+                }
               </div>
             `;
-          }).join("")}
+            })
+            .join("")}
         </div>
       `;
     }
 
     document.getElementById("viewPostDetailArea").innerHTML = detailHTML;
+
+    // Gán sự kiện chuyển sang trang trang cá nhân nếu click vào tác giả
+    const postAuthorInfo = document.getElementById("postAuthorInfo");
+    if (postAuthorInfo && isPostOwner) {
+      postAuthorInfo.addEventListener("click", () => {
+        window.location.href = "edit-profile.html";
+      });
+    }
   } catch (error) {
     console.error("Lỗi lấy dữ liệu chi tiết:", error);
   }
@@ -201,7 +236,7 @@ function listenToComments(postId) {
   const q = query(
     collection(db, "comments"),
     where("postId", "==", postId),
-    orderBy("createdAt", "asc")
+    orderBy("createdAt", "asc"),
   );
 
   unsubscribeComments = onSnapshot(q, (snapshot) => {
@@ -218,39 +253,72 @@ function listenToComments(postId) {
       const comment = { id: docSnap.id, ...docSnap.data() };
       const isCommentOwner = comment.userId === currentUser?.uid;
 
+      // Ưu tiên thông tin Auth nếu là chủ bình luận
+      const commentAvatar = isCommentOwner
+        ? currentUser?.photoURL ||
+          "https://cdn-icons-png.flaticon.com/512/3177/3177440.png"
+        : comment.userAvatar ||
+          "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+
+      const commentName = isCommentOwner
+        ? currentUser?.displayName || "Thành viên"
+        : comment.userName || "Thành viên";
+
       const commentNode = document.createElement("div");
-      commentNode.style = "display:flex; gap:12px; background:#f8f9fa; padding:12px 16px; border-radius:12px; align-items:flex-start;";
+      commentNode.style =
+        "display:flex; gap:12px; background:#f8f9fa; padding:12px 16px; border-radius:12px; align-items:flex-start;";
       commentNode.innerHTML = `
-        <img src="${comment.userAvatar}" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
+        <img src="${commentAvatar}" style="width:32px; height:32px; border-radius:50%; object-fit:cover; ${isCommentOwner ? "cursor:pointer;" : ""}" class="comment-avatar">
         <div style="flex:1;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-weight:700; font-size:13px; color:#2d3436;">${comment.userName}</span>
-                ${isCommentOwner ? `
+                <span style="font-weight:700; font-size:13px; color:#2d3436; ${isCommentOwner ? "cursor:pointer;" : ""}" class="comment-username">${commentName}</span>
+                ${
+                  isCommentOwner
+                    ? `
                     <div style="display:flex; gap:8px; font-size:11px;">
                         <span class="edit-cmt-btn" style="color:#27ae60; cursor:pointer; font-weight:600;"><i class="fas fa-edit"></i> Sửa</span>
                         <span class="delete-cmt-btn" style="color:#be2c2c; cursor:pointer; font-weight:600;"><i class="fas fa-trash"></i> Xóa</span>
                     </div>
-                ` : ""}
+                `
+                    : ""
+                }
             </div>
             <p style="font-size:13.5px; color:#2f3542; margin-top:4px; line-height:1.4;">${comment.text}</p>
         </div>
       `;
 
       if (isCommentOwner) {
-        commentNode.querySelector(".edit-cmt-btn").addEventListener("click", () => {
-          document.getElementById("editingCommentId").value = comment.id;
-          document.getElementById("commentInput").value = comment.text;
-          document.getElementById("submitCommentBtn").innerText = "Cập nhật";
-          document.getElementById("cancelEditCommentBtn").style.display = "inline-block";
-          document.getElementById("commentInput").focus();
-        });
+        // Chuyển sang edit-profile khi bấm vào avatar/tên trong cmt
+        const cmtAvatarEl = commentNode.querySelector(".comment-avatar");
+        const cmtNameEl = commentNode.querySelector(".comment-username");
 
-        commentNode.querySelector(".delete-cmt-btn").addEventListener("click", async () => {
-          if (confirm("Bạn thực sự muốn xóa bình luận này?")) {
-            await deleteDoc(doc(db, "comments", comment.id));
-            showToast("Bình luận đã được xóa!");
+        [cmtAvatarEl, cmtNameEl].forEach((el) => {
+          if (el) {
+            el.addEventListener("click", () => {
+              window.location.href = "edit-profile.html";
+            });
           }
         });
+
+        commentNode
+          .querySelector(".edit-cmt-btn")
+          .addEventListener("click", () => {
+            document.getElementById("editingCommentId").value = comment.id;
+            document.getElementById("commentInput").value = comment.text;
+            document.getElementById("submitCommentBtn").innerText = "Cập nhật";
+            document.getElementById("cancelEditCommentBtn").style.display =
+              "inline-block";
+            document.getElementById("commentInput").focus();
+          });
+
+        commentNode
+          .querySelector(".delete-cmt-btn")
+          .addEventListener("click", async () => {
+            if (confirm("Bạn thực sự muốn xóa bình luận này?")) {
+              await deleteDoc(doc(db, "comments", comment.id));
+              showToast("Bình luận đã được xóa!");
+            }
+          });
       }
 
       commentsList.appendChild(commentNode);
@@ -280,7 +348,9 @@ if (commentForm) {
           postId: activePostId,
           userId: currentUser.uid,
           userName: currentUser.displayName || "Thành viên",
-          userAvatar: currentUser.photoURL || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
+          userAvatar:
+            currentUser.photoURL ||
+            "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
           text: text,
           createdAt: Date.now(),
         });

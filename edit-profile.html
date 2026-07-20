@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chỉnh Sửa Trang Cá Nhân - NomNom</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="header-left">
+        <a href="index.html" style="text-decoration: none;">
+          <div class="logo">Nom<span>Nom</span></div>
+        </a>
+      </div>
+      <div class="header-right">
+        <a href="index.html" class="btn-login" style="text-decoration: none; display: flex; align-items: center; gap: 6px;">
+          <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+      </div>
+    </header>
+
+    <div class="app-layout" style="justify-content: center;">
+      <main class="main-content-area" style="max-width: 600px; width: 100%; background: #fff; border-radius: 12px; margin: 20px 0; box-shadow: var(--shadow-sm); padding: 30px;">
+        
+        <h2 style="font-size: 20px; font-weight: 700; color: #1e272e; margin-bottom: 20px; border-bottom: 2px solid #f1f2f6; padding-bottom: 10px;">
+          <i class="fas fa-user-edit" style="color: var(--primary-color);"></i> Chỉnh sửa trang cá nhân
+        </h2>
+
+        <div id="profileLoading" class="empty-state">
+          <i class="fas fa-spinner fa-spin"></i>
+          <h2>Đang tải thông tin cá nhân...</h2>
+        </div>
+
+        <form id="editProfileForm" style="display: none;">
+          
+          <div style="text-align: center; margin-bottom: 24px;">
+            <div style="position: relative; display: inline-block;">
+              <img id="avatarPreview" src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png" alt="Avatar" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-color);" />
+            </div>
+            
+            <div style="margin-top: 12px;">
+              <label for="avatarFileInput" class="btn-login" style="cursor: pointer; display: inline-block; font-size: 13px;">
+                <i class="fas fa-camera"></i> Chọn ảnh mới từ máy
+              </label>
+              <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" />
+            </div>
+            
+            <div id="uploadStatus" style="font-size: 12px; margin-top: 6px; font-weight: 600;"></div>
+
+            <div style="margin-top: 10px;">
+              <label style="font-size: 12px; font-weight: 600; color: #57606f; display: block; margin-bottom: 5px;">Hoặc nhập Link Ảnh (URL)</label>
+              <input type="url" id="editAvatarUrl" placeholder="https://example.com/avatar.jpg" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;" />
+            </div>
+          </div>
+
+          <div style="margin-bottom: 18px;">
+            <label style="font-size: 14px; font-weight: 600; color: #2f3542; display: block; margin-bottom: 6px;">Tên hiển thị <span style="color: red;">*</span></label>
+            <input type="text" id="editDisplayName" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;" placeholder="Nhập tên của bạn..." />
+          </div>
+
+          <div style="margin-bottom: 24px;">
+            <label style="font-size: 14px; font-weight: 600; color: #2f3542; display: block; margin-bottom: 6px;">Tiểu sử (Bio)</label>
+            <textarea id="editBio" rows="4" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; resize: vertical;" placeholder="Giới thiệu ngắn về bản thân hoặc sở thích ẩm thực..."></textarea>
+          </div>
+
+          <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <a href="index.html" class="btn-login" style="text-decoration: none; background: #b2bec3; color: white;">Hủy</a>
+            <button type="submit" id="btnSaveProfile" class="btn-add-post" style="border: none; cursor: pointer; padding: 10px 20px;">
+              <i class="fas fa-save"></i> Lưu thay đổi
+            </button>
+          </div>
+
+        </form>
+      </main>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script type="module" src="edit-profile.js"></script>
+  </body>
+</html>

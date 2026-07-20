@@ -47,13 +47,13 @@
     <div class="app-layout">
       <aside class="left-sidebar">
         <nav class="sidebar-menu">
-          <a href="#" class="sidebar-item active" data-page="explore">
-            <i class="fas fa-compass"></i>
-            <span>Khám phá</span>
-          </a>
-          <a href="#" class="sidebar-item" data-page="home">
+          <a href="#" class="sidebar-item active" data-page="home">
             <i class="fas fa-home"></i>
             <span>Trang chủ</span>
+          </a>
+          <a href="#" class="sidebar-item" data-page="explore">
+            <i class="fas fa-compass"></i>
+            <span>Khám phá</span>
           </a>
           <a href="#" class="sidebar-item" data-page="saved">
             <i class="fas fa-bookmark"></i>
@@ -63,7 +63,40 @@
       </aside>
 
       <main class="main-content-area" id="mainContentWindow">
-        <section class="page-view active" id="page-explore">
+        <section class="page-view active" id="page-home">
+          <div class="home-hero-section">
+            <h1 class="hero-title">Chào mừng bạn đến với <span>NomNom</span>! </h1>
+            <p class="hero-subtitle">Cộng đồng chia sẻ niềm đam mê ẩm thực, công thức nấu ăn gia đình và những địa điểm ăn uống không thể bỏ qua.</p>
+          </div>
+
+          <div class="about-grid">
+            <div class="about-card">
+              <div class="about-icon"><i class="fas fa-heart"></i></div>
+              <h3>Tại Sao NomNom Ra Đời?</h3>
+              <p>Chúng mình tin rằng món ăn không chỉ để no bụng, mà còn là sợi dây kết nối tình cảm. NomNom được tạo ra nhằm mang đến một không gian đơn giản, ấm cúng giúp mọi người dễ dàng lưu giữ và chia sẻ những công thức nấu ăn ngon cũng như các quán ăn ruột của mình.</p>
+            </div>
+
+            <div class="about-card">
+              <div class="about-icon"><i class="fas fa-utensils"></i></div>
+              <h3>Bạn Có Thể Làm Gì?</h3>
+              <p>• <strong>Tìm kiếm công thức:</strong> Học nấu các món ăn từ đơn giản đến phức tạp.<br>
+                 • <strong>Chia sẻ bài viết:</strong> Đăng tải công thức cá nhân kèm video/hình ảnh chi tiết.<br>
+                 • <strong>Review quán ngon:</strong> Gợi ý địa điểm ăn uống chất lượng cho cộng đồng.</p>
+            </div>
+          </div>
+
+          <div class="contact-section">
+            <h2><i class="fas fa-envelope"></i> Liên Hệ Với Chúng Mình</h2>
+            <p>Bạn có góp ý hoặc muốn hợp tác cùng NomNom? Đừng ngần ngại liên hệ nhé!</p>
+            <div class="contact-info-list">
+              <div class="contact-item"><i class="fas fa-paper-plane"></i> <span>Email: support@nomnom.vn</span></div>
+              <div class="contact-item"><i class="fas fa-phone-alt"></i> <span>Hotline: 0123 456 789</span></div>
+              <div class="contact-item"><i class="fas fa-map-marker-alt"></i> <span>Địa chỉ: Hà Nội, Việt Nam</span></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="page-view" id="page-explore">
           <nav class="filter-nav">
             <a href="#" class="nav-item active" data-filter="all">Tất cả bài viết</a>
             <a href="#" class="nav-item" data-filter="recipe">Công thức nấu ăn</a>
@@ -76,23 +109,25 @@
           </div>
         </section>
 
-        <section class="page-view" id="page-home">
-          <div class="empty-state">
-            <i class="fas fa-home"></i>
-            <h2>Đây là nội dung của Trang Chủ</h2>
-          </div>
-        </section>
         <section class="page-view" id="page-saved">
-          <div class="empty-state">
-            <i class="fas fa-bookmark"></i>
-            <h2>Bài viết bạn đã lưu sẽ hiển thị ở đây</h2>
+          <div class="section-header" style="margin-bottom: 20px">
+            <h2 style="font-size: 20px; font-weight: 700; color: #1e272e">
+              <i class="fas fa-bookmark" style="color: #be2c2c; margin-right: 8px"></i>Bài viết đã lưu
+            </h2>
+          </div>
+
+          <div class="posts-grid" id="savedPostsContainer">
+            <div class="empty-state" style="grid-column: 1/-1;">
+              <i class="fas fa-bookmark"></i>
+              <h2>Bài viết bạn đã lưu sẽ hiển thị ở đây</h2>
+            </div>
           </div>
         </section>
       </main>
     </div>
 
     <div class="modal-overlay" id="foodModal" style="display: none">
-      <div class="modal-box" style="max-height: 90vh; overflow-y: auto;">
+      <div class="modal-box" style="max-height: 90vh; overflow-y: auto">
         <div class="modal-header">
           <h2 id="modalTitle">Chia Sẻ Bài Viết Mới</h2>
           <button class="btn-close-modal" id="closeModalBtn">&times;</button>
@@ -113,16 +148,16 @@
             <input type="text" id="foodName" required placeholder="Nhập tên..." />
           </div>
 
-          <div id="recipeTimeGroup" style="display: flex; gap: 10px;">
-            <div class="form-group" style="flex: 1;">
+          <div id="recipeTimeGroup" style="display: flex; gap: 10px">
+            <div class="form-group" style="flex: 1">
               <label>Chuẩn bị (phút):</label>
               <input type="number" id="prepTime" placeholder="Ví dụ: 30" />
             </div>
-            <div class="form-group" style="flex: 1;">
+            <div class="form-group" style="flex: 1">
               <label>Chế biến (phút):</label>
               <input type="number" id="cookTime" placeholder="Ví dụ: 20" />
             </div>
-            <div class="form-group" style="flex: 1;">
+            <div class="form-group" style="flex: 1">
               <label>Khẩu phần (người):</label>
               <input type="text" id="servingSize" placeholder="Ví dụ: 3 - 4 người" />
             </div>
@@ -136,8 +171,8 @@
           <div class="form-group">
             <label for="foodImageFile">Hình ảnh thành phẩm:</label>
             <input type="file" id="foodImageFile" accept="image/*" />
-            <input type="hidden" id="foodImageUrl" /> 
-            <div id="uploadStatus" style="font-size: 12px; color: #718093; margin-top: 4px;"></div>
+            <input type="hidden" id="foodImageUrl" />
+            <div id="uploadStatus" style="font-size: 12px; color: #718093; margin-top: 4px"></div>
             <img id="imagePreview" src="" style="max-height: 120px; object-fit: cover; border-radius: 6px; display: none; margin-top: 8px;" />
           </div>
 
@@ -151,17 +186,15 @@
             <textarea id="foodContent" rows="3" required placeholder="Nêu cảm nghĩ hoặc mô tả sơ lược về món ăn của bạn..."></textarea>
           </div>
 
-          <div id="recipeStepsSection" style="margin-top: 10px;">
+          <div id="recipeStepsSection" style="margin-top: 10px">
             <label style="font-size: 13.5px; font-weight: 600; display: block; margin-bottom: 8px;">Cách làm từng bước:</label>
-            <div id="stepsContainerList" style="display: flex; flex-direction: column; gap: 12px;">
-             
-            </div>
+            <div id="stepsContainerList" style="display: flex; flex-direction: column; gap: 12px"></div>
             <button type="button" id="btnAddStep" style="margin-top: 10px; background: #eaedf1; border: 1px dashed #ced4da; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%; text-align: center; color: #57606f;">
               <i class="fas fa-plus"></i> Thêm bước thực hiện
             </button>
           </div>
 
-          <button type="submit" class="btn-submit" id="saveBtn" style="margin-top: 15px;">
+          <button type="submit" class="btn-submit" id="saveBtn" style="margin-top: 15px">
             Đăng bài viết
           </button>
         </form>
@@ -169,6 +202,37 @@
     </div>
 
     <div id="toastContainer" class="toast-container"></div>
+
+    <div id="profileModal" class="modal" style="display: none">
+      <div class="modal-content" style="max-width: 450px">
+        <span id="closeProfileModalBtn" class="close-btn">&times;</span>
+        <h2>Chỉnh Sửa Trang Cá Nhân</h2>
+
+        <form id="profileForm">
+          <div class="form-group" style="text-align: center; margin-bottom: 15px">
+            <img id="profileAvatarPreview" src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png" alt="Avatar Preview" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 2px solid #ddd;" />
+            <div>
+              <label for="profileAvatarFile" style="cursor: pointer; background: #f0f0f0; padding: 6px 12px; border-radius: 4px; font-size: 13px;">
+                <i class="fas fa-camera"></i> Chọn ảnh đại diện mới
+              </label>
+              <input type="file" id="profileAvatarFile" accept="image/*" style="display: none" />
+            </div>
+            <p id="profileUploadStatus" style="font-size: 12px; margin-top: 5px"></p>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 15px">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px">Tên hiển thị:</label>
+            <input type="text" id="profileDisplayName" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" required />
+          </div>
+
+          <input type="hidden" id="profileAvatarUrl" />
+
+          <button type="submit" style="width: 100%; padding: 10px; background: #27ae60; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
+            Lưu thay đổi
+          </button>
+        </form>
+      </div>
+    </div>
 
     <script type="module" src="app.js"></script>
   </body>

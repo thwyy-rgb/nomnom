@@ -130,7 +130,7 @@ body:has(#emailRegisterForm) .auth-side-bg {
   background-color: var(--recipe-color) !important;
 }
 .btn-register-color:hover {
-  background-color: #219653 !important;
+  background-color: #ff4757 !important;
 }
 
 .auth-divider {
