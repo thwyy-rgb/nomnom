@@ -21,7 +21,6 @@ const auth = getAuth(app);
 const CLOUDINARY_CLOUD_NAME = "dnurk6t58";
 const CLOUDINARY_UPLOAD_PRESET = "uniqblfi";
 
-// Sửa lại đúng ID khớp với file HTML của bạn
 const profileLoading = document.getElementById("profileLoading"); 
 const profileForm = document.getElementById("editProfileForm"); 
 const editNameInput = document.getElementById("editDisplayName");
@@ -29,6 +28,7 @@ const editAvatarInput = document.getElementById("editAvatarUrl");
 const avatarPreview = document.getElementById("avatarPreview");
 const avatarFileInput = document.getElementById("avatarFileInput");
 const uploadStatus = document.getElementById("uploadStatus");
+const btnSaveProfile = document.getElementById("btnSaveProfile");
 
 onAuthStateChanged(auth, (user) => {
   if (!user) {
@@ -40,13 +40,11 @@ onAuthStateChanged(auth, (user) => {
       avatarPreview.src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
     }
 
-    // Ẩn loading và hiển thị Form
     if (profileLoading) profileLoading.style.display = "none";
     if (profileForm) profileForm.style.display = "block";
   }
 });
 
-// Xử lý khi nhập link ảnh trực tiếp
 if (editAvatarInput) {
   editAvatarInput.addEventListener("input", (e) => {
     const url = e.target.value.trim();
@@ -56,14 +54,13 @@ if (editAvatarInput) {
   });
 }
 
-// Xử lý upload ảnh từ máy lên Cloudinary
 if (avatarFileInput) {
   avatarFileInput.addEventListener("change", async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     if (uploadStatus) {
-      uploadStatus.innerText = "Đang tải ảnh...";
+      uploadStatus.innerText = "Đang tải ảnh lên Cloudinary...";
       uploadStatus.style.color = "#27ae60";
     }
 
@@ -85,6 +82,8 @@ if (avatarFileInput) {
           uploadStatus.innerText = "Tải ảnh thành công!";
           uploadStatus.style.color = "#2ecc71";
         }
+      } else {
+        throw new Error("Lỗi tải ảnh");
       }
     } catch (err) {
       console.error(err);
@@ -96,22 +95,31 @@ if (avatarFileInput) {
   });
 }
 
-// Submit Form lưu thông tin
 if (profileForm) {
   profileForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!auth.currentUser) return;
 
     try {
+      if (btnSaveProfile) {
+        btnSaveProfile.disabled = true;
+        btnSaveProfile.innerText = "Đang lưu...";
+      }
+
       await updateProfile(auth.currentUser, {
         displayName: editNameInput.value.trim(),
         photoURL: editAvatarInput.value.trim(),
       });
+
       alert("Cập nhật trang cá nhân thành công!");
       window.location.href = "index.html";
     } catch (err) {
       console.error(err);
       alert("Không thể cập nhật hồ sơ!");
+      if (btnSaveProfile) {
+        btnSaveProfile.disabled = false;
+        btnSaveProfile.innerText = "Lưu thay đổi";
+      }
     }
   });
 }

@@ -30,14 +30,12 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// ================= CLOUDINARY CONFIGURATION =================
 const CLOUDINARY_CLOUD_NAME = "dnurk6t58";
 const CLOUDINARY_UPLOAD_PRESET = "uniqblfi";
-// ============================================================
 
 let currentUser = null;
 let allPostsCache = [];
-let savedPostIds = []; // Mảng chứa ID các bài viết đã lưu
+let savedPostIds = []; 
 let currentFilterNav = "all";
 let currentFilterType = "all";
 
@@ -82,7 +80,6 @@ if (logoutBtn) {
   });
 }
 
-// LOGIC TẢI ẢNH BÀI VIẾT LÊN CLOUDINARY
 const foodImageFileInput = document.getElementById("foodImageFile");
 const foodImageUrlInput = document.getElementById("foodImageUrl");
 const uploadStatus = document.getElementById("uploadStatus");
@@ -106,7 +103,7 @@ if (foodImageFileInput) {
         {
           method: "POST",
           body: formData,
-        }
+        },
       );
       const data = await response.json();
 
@@ -128,7 +125,6 @@ if (foodImageFileInput) {
   });
 }
 
-// QUẢN LÝ THÊM/XÓA BƯỚC THỰC HIỆN TÍCH HỢP Ô NHẬP VIDEO
 const btnAddStep = document.getElementById("btnAddStep");
 const stepsContainerList = document.getElementById("stepsContainerList");
 
@@ -194,8 +190,11 @@ function updateFormLabels(type) {
   const recipeStepsSection = document.getElementById("recipeStepsSection");
 
   if (type === "recipe") {
-    if (lblDynamic) lblDynamic.innerText = "Nguyên liệu làm món (cách nhau bởi dấu phẩy):";
-    if (dynamicInput) dynamicInput.placeholder = "Ví dụ: 300g thịt ba rọi, 150g dứa, 2 tép tỏi...";
+    if (lblDynamic)
+      lblDynamic.innerText = "Nguyên liệu làm món (cách nhau bởi dấu phẩy):";
+    if (dynamicInput)
+      dynamicInput.placeholder =
+        "Ví dụ: 300g thịt ba rọi, 150g dứa, 2 tép tỏi...";
     if (recipeTimeGroup) recipeTimeGroup.style.display = "flex";
     if (recipeStepsSection) recipeStepsSection.style.display = "block";
   } else {
@@ -213,15 +212,18 @@ if (postTypeSelect) {
   });
 }
 
-// SỰ KIỆN CLICK SIDEBAR MENU TRÁI
 document.querySelectorAll(".sidebar-item").forEach((item) => {
   item.addEventListener("click", function (e) {
     e.preventDefault();
-    document.querySelectorAll(".sidebar-item").forEach((i) => i.classList.remove("active"));
+    document
+      .querySelectorAll(".sidebar-item")
+      .forEach((i) => i.classList.remove("active"));
     this.classList.add("active");
 
     const targetPageId = this.getAttribute("data-page");
-    document.querySelectorAll(".page-view").forEach((page) => page.classList.remove("active"));
+    document
+      .querySelectorAll(".page-view")
+      .forEach((page) => page.classList.remove("active"));
 
     const targetPageNode = document.getElementById(`page-${targetPageId}`);
     if (targetPageNode) targetPageNode.classList.add("active");
@@ -234,26 +236,30 @@ document.querySelectorAll(".sidebar-item").forEach((item) => {
   });
 });
 
-// LẮNG NGHE BÀI VIẾT ĐÃ LƯU
 function listenToSavedPosts() {
   if (!currentUser) return;
-  onSnapshot(collection(db, "users", currentUser.uid, "savedPosts"), (snapshot) => {
-    savedPostIds = snapshot.docs.map((doc) => doc.id);
-    displayPosts(allPostsCache);
-    displaySavedPosts();
-  });
+  onSnapshot(
+    collection(db, "users", currentUser.uid, "savedPosts"),
+    (snapshot) => {
+      savedPostIds = snapshot.docs.map((doc) => doc.id);
+      displayPosts(allPostsCache);
+      displaySavedPosts();
+    },
+  );
 }
 
-// HÀM HIỂN THỊ BÀI VIẾT TẠI TRANG KHÁM PHÁ
 function displayPosts(posts) {
   const postsContainer = document.getElementById("postsContainer");
   if (!postsContainer) return;
   postsContainer.innerHTML = "";
 
   const filtered = posts.filter((post) => {
-    if (currentFilterNav === "recipe" && post.postType !== "recipe") return false;
-    if (currentFilterNav === "review" && post.postType !== "review") return false;
-    if (currentFilterNav === "mine" && post.userId !== currentUser?.uid) return false;
+    if (currentFilterNav === "recipe" && post.postType !== "recipe")
+      return false;
+    if (currentFilterNav === "review" && post.postType !== "review")
+      return false;
+    if (currentFilterNav === "mine" && post.userId !== currentUser?.uid)
+      return false;
     if (currentFilterType !== "all") {
       const tagKeyword = currentFilterType.toLowerCase();
       const inputData = (post.dynamicInput || "").toLowerCase();
@@ -278,12 +284,14 @@ function displayPosts(posts) {
     const isSaved = savedPostIds.includes(post.id);
 
     const authorAvatar = isOwner
-      ? (currentUser?.photoURL || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png")
-      : (post.userAvatar || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png");
+      ? currentUser?.photoURL ||
+        "https://cdn-icons-png.flaticon.com/512/3177/3177440.png"
+      : post.userAvatar ||
+        "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
 
     const authorName = isOwner
-      ? (currentUser?.displayName || "Thành viên")
-      : (post.userName || "Thành viên");
+      ? currentUser?.displayName || "Thành viên"
+      : post.userName || "Thành viên";
 
     const card = document.createElement("div");
     card.className = "post-card";
@@ -338,24 +346,27 @@ function displayPosts(posts) {
         e.stopPropagation();
         openEditModal(post);
       });
-      card.querySelector(".btn-card-delete")?.addEventListener("click", async (e) => {
-        e.stopPropagation();
-        if (confirm(`Bạn chắc chắn muốn xóa bài viết "${post.foodName}" chứ?`)) {
-          try {
-            await deleteDoc(doc(db, "posts", post.id));
-            showToast("Đã xóa bài viết thành công!");
-          } catch (err) {
-            showToast("Không thể xóa bài viết!", "danger");
+      card
+        .querySelector(".btn-card-delete")
+        ?.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          if (
+            confirm(`Bạn chắc chắn muốn xóa bài viết "${post.foodName}" chứ?`)
+          ) {
+            try {
+              await deleteDoc(doc(db, "posts", post.id));
+              showToast("Đã xóa bài viết thành công!");
+            } catch (err) {
+              showToast("Không thể xóa bài viết!", "danger");
+            }
           }
-        }
-      });
+        });
     }
 
     postsContainer.appendChild(card);
   });
 }
 
-// HÀM XỬ LÝ LƯU / BỎ LƯU BÀI VIẾT
 async function toggleSavePost(postId) {
   if (!currentUser) return;
   const savedRef = doc(db, "users", currentUser.uid, "savedPosts", postId);
@@ -374,12 +385,13 @@ async function toggleSavePost(postId) {
   }
 }
 
-// HÀM HIỂN THỊ DANH SÁCH BÀI VIẾT ĐÃ LƯU (ĐÃ ĐƯỢC FIX AVATAR)
 function displaySavedPosts() {
   const savedContainer = document.getElementById("savedPostsContainer");
   if (!savedContainer) return;
 
-  const savedPosts = allPostsCache.filter((post) => savedPostIds.includes(post.id));
+  const savedPosts = allPostsCache.filter((post) =>
+    savedPostIds.includes(post.id),
+  );
 
   if (savedPosts.length === 0) {
     savedContainer.innerHTML = `
@@ -397,12 +409,14 @@ function displaySavedPosts() {
     const isOwner = post.userId === currentUser?.uid;
 
     const authorAvatar = isOwner
-      ? (currentUser?.photoURL || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png")
-      : (post.userAvatar || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png");
+      ? currentUser?.photoURL ||
+        "https://cdn-icons-png.flaticon.com/512/3177/3177440.png"
+      : post.userAvatar ||
+        "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
 
     const authorName = isOwner
-      ? (currentUser?.displayName || "Thành viên")
-      : (post.userName || "Thành viên");
+      ? currentUser?.displayName || "Thành viên"
+      : post.userName || "Thành viên";
 
     const card = document.createElement("div");
     card.className = "post-card";
@@ -438,7 +452,6 @@ function displaySavedPosts() {
   });
 }
 
-// SỰ KIỆN CLICK TABS PHÂN LOẠI BÀI VIẾT
 document.querySelectorAll(".filter-nav .nav-item").forEach((tab) => {
   tab.addEventListener("click", function (e) {
     e.preventDefault();
@@ -452,7 +465,6 @@ document.querySelectorAll(".filter-nav .nav-item").forEach((tab) => {
   });
 });
 
-// THANH SEARCH Ô NHẬP LIỆU REAL-TIME
 const searchInput = document.getElementById("searchInput");
 if (searchInput) {
   searchInput.addEventListener("input", () => {
@@ -479,11 +491,10 @@ function listenToPosts() {
     },
     (error) => {
       console.error("Lỗi dữ liệu bài viết:", error);
-    }
+    },
   );
 }
 
-// MODAL THÊM / SỬA BÀI VIẾT
 const foodModal = document.getElementById("foodModal");
 const openAddModalBtn = document.getElementById("openAddModalBtn");
 const closeModalBtn = document.getElementById("closeModalBtn");
@@ -524,11 +535,18 @@ function openEditModal(post) {
   document.getElementById("foodVideoUrl").value = post.foodVideoUrl || "";
   document.getElementById("foodContent").value = post.foodContent;
 
-  if (post.foodImageUrl) {
-    imagePreview.src = post.foodImageUrl;
-    imagePreview.style.display = "block";
-  } else {
-    imagePreview.style.display = "none";
+  // TỰ ĐỘNG HIỂN THỊ PREVIEW KHIN DÁN LINK ẢNH
+  if (foodImageUrlInput) {
+    foodImageUrlInput.addEventListener("input", (e) => {
+      const url = e.target.value.trim();
+      if (url !== "") {
+        imagePreview.src = url;
+        imagePreview.style.display = "block";
+        if (uploadStatus) uploadStatus.innerText = "";
+      } else {
+        imagePreview.style.display = "none";
+      }
+    });
   }
 
   updateFormLabels(post.postType);
@@ -572,7 +590,8 @@ if (foodForm) {
     if (postType === "recipe") {
       postData.prepTime = document.getElementById("prepTime").value || "0";
       postData.cookTime = document.getElementById("cookTime").value || "0";
-      postData.servingSize = document.getElementById("servingSize").value || "Nhiều người";
+      postData.servingSize =
+        document.getElementById("servingSize").value || "Nhiều người";
       postData.steps = getStepsData();
     }
 
@@ -583,7 +602,9 @@ if (foodForm) {
       } else {
         postData.userId = currentUser.uid;
         postData.userName = currentUser.displayName || "Thành viên";
-        postData.userAvatar = currentUser.photoURL || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+        postData.userAvatar =
+          currentUser.photoURL ||
+          "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
         postData.createdAt = Date.now();
         await addDoc(collection(db, "posts"), postData);
         showToast("Đăng bài viết mới thành công!");
@@ -596,7 +617,6 @@ if (foodForm) {
   });
 }
 
-// ================= QUẢN LÝ CHỈNH SỬA TRANG CÁ NHÂN =================
 const profileModal = document.getElementById("profileModal");
 const closeProfileModalBtn = document.getElementById("closeProfileModalBtn");
 const profileForm = document.getElementById("profileForm");
@@ -642,7 +662,7 @@ if (profileAvatarFile) {
         {
           method: "POST",
           body: formData,
-        }
+        },
       );
       const data = await response.json();
 
@@ -685,7 +705,7 @@ if (profileForm) {
 
       currentUser = auth.currentUser;
       setupUIForUser();
-      
+
       showToast("Cập nhật trang cá nhân thành công!");
       if (profileModal) profileModal.style.display = "none";
     } catch (err) {

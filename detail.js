@@ -61,7 +61,6 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// Hàm hỗ trợ render Video (nhúng Iframe YouTube hoặc hiện nút bấm link ngoài)
 function renderVideoElement(videoUrl) {
   if (!videoUrl) return "";
 
@@ -126,7 +125,7 @@ async function loadPostDetail(postId) {
             <div style="font-size:12px; color:#718093;">Phân loại: ${post.postType === "recipe" ? "Công thức nấu ăn" : "Review quán ăn"}</div>
         </div>
       </div>
-      <img src="${post.foodImageUrl || "https://images.unsplash.com/photo-1498837167922-ddd27525d352?q=80&w=600"}" class="detail-banner">
+      ${post.foodImageUrl ? `<img src="${post.foodImageUrl}" class="detail-banner">` : ""}
       
       <!-- Video thành phẩm (nếu có) -->
       ${
