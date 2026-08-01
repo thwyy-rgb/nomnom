@@ -1,4 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { isAdminUser } from "./adminConfig.js";
 import {
   getFirestore,
   collection,
@@ -68,6 +69,14 @@ function setupUIForUser() {
   }
   if (userName) {
     userName.innerText = currentUser.displayName || "Thành viên";
+
+    if (isAdminUser(currentUser) && !document.getElementById("adminBadge")) {
+      const badge = document.createElement("span");
+      badge.id = "adminBadge";
+      badge.className = "badge-admin";
+      badge.innerText = "ADMIN";
+      userName.appendChild(badge);
+    }
   }
 }
 
@@ -282,6 +291,9 @@ function displayPosts(posts) {
     const isRecipe = post.postType === "recipe";
     const isOwner = post.userId === currentUser?.uid;
     const isSaved = savedPostIds.includes(post.id);
+    
+    // 🟢 Kiểm tra xem User hiện tại có phải Admin không
+    const isAdmin = isAdminUser(currentUser);
 
     const authorAvatar = isOwner
       ? currentUser?.photoURL ||
@@ -310,16 +322,10 @@ function displayPosts(posts) {
           <p class="post-excerpt">${post.foodContent || "Không có mô tả chi tiết bài viết..."}</p>
           
           <div style="display:flex; justify-content:flex-end; align-items:center; margin-top:10px; min-height: 25px;">
-              ${
-                isOwner
-                  ? `
-                  <div style="display:flex; gap:8px;">
-                      <button class="btn-card-edit" style="background:none; border:none; color:#27ae60; cursor:pointer; font-size:13px;"><i class="fas fa-edit"></i> Sửa</button>
-                      <button class="btn-card-delete" style="background:none; border:none; color:#be2c2c; cursor:pointer; font-size:13px;"><i class="fas fa-trash"></i> Xóa</button>
-                  </div>
-              `
-                  : ""
-              }
+              <div style="display:flex; gap:8px;">
+                ${isOwner ? `<button class="btn-card-edit" style="background:none; border:none; color:#27ae60; cursor:pointer; font-size:13px;"><i class="fas fa-edit"></i> Sửa</button>` : ''}
+                ${(isOwner || isAdmin) ? `<button class="btn-card-delete" style="background:none; border:none; color:#be2c2c; cursor:pointer; font-size:13px;"><i class="fas fa-trash"></i> Xóa ${isAdmin && !isOwner ? '(Admin)' : ''}</button>` : ''}
+              </div>
           </div>
 
           <div class="post-author">
@@ -329,10 +335,12 @@ function displayPosts(posts) {
       </div>
     `;
 
+    // Click vào card để tới trang chi tiết
     card.addEventListener("click", () => {
       window.location.href = `detail.html?id=${post.id}`;
     });
 
+    // Nút Bookmark bài viết
     const bookmarkBtn = card.querySelector(".btn-bookmark");
     if (bookmarkBtn) {
       bookmarkBtn.addEventListener("click", async (e) => {
@@ -341,22 +349,31 @@ function displayPosts(posts) {
       });
     }
 
+    // Nút Sửa (Chỉ chính chủ)
     if (isOwner) {
       card.querySelector(".btn-card-edit")?.addEventListener("click", (e) => {
         e.stopPropagation();
         openEditModal(post);
       });
+    }
+
+    // Nút Xóa (Cho Cả Chính chủ VÀ Admin)
+    if (isOwner || isAdmin) {
       card
         .querySelector(".btn-card-delete")
         ?.addEventListener("click", async (e) => {
           e.stopPropagation();
-          if (
-            confirm(`Bạn chắc chắn muốn xóa bài viết "${post.foodName}" chứ?`)
-          ) {
+          
+          const confirmMsg = isAdmin && !isOwner 
+            ? `[ADMIN] Bạn chắc chắn muốn xóa bài viết "${post.foodName}" của ${post.userName || "thành viên này"}?`
+            : `Bạn chắc chắn muốn xóa bài viết "${post.foodName}" chứ?`;
+
+          if (confirm(confirmMsg)) {
             try {
               await deleteDoc(doc(db, "posts", post.id));
               showToast("Đã xóa bài viết thành công!");
             } catch (err) {
+              console.error(err);
               showToast("Không thể xóa bài viết!", "danger");
             }
           }
