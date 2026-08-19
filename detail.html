@@ -29,24 +29,31 @@
                 </div>
             </div>
 
-            <hr class="divider">
+            <hr class="divider" style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
 
-            <h4 class="comments-title">
-                <i class="far fa-comments"></i> Bình luận (<span id="commentCount">0</span>)
-            </h4>
-            
-            <div id="commentsList" class="comments-list"></div>
+            <section class="comments-section">
+                <h4 class="comments-title" style="font-size: 18px; font-weight: 700; color: #2d3436; margin-bottom: 20px;">
+                    <i class="far fa-comments"></i> Bình luận (<span id="commentCount">0</span>)
+                </h4>
+                
+                <div id="commentAuthWarning" style="display: none; background: #fff3cd; color: #856404; padding: 12px 16px; border-radius: 8px; font-size: 14px; margin-bottom: 20px; border: 1px solid #ffeeba;">
+                    Bạn cần <a href="login.html" style="color: #e67e22; font-weight: 700; text-decoration: underline;">Đăng nhập</a> để viết bình luận.
+                </div>
 
-            <div id="commentAuthWarning" class="auth-warning is-hidden">
-                Bạn cần <a href="login.html" class="login-link">Đăng nhập</a> để viết bình luận.
-            </div>
+                <form id="commentForm" style="display: none; gap: 12px; align-items: flex-start; margin-bottom: 25px;">
+                    <img id="currentUserAvatar" src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png" alt="Avatar" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                        <input type="hidden" id="editingCommentId" value="" />
+                        <input type="text" id="commentInput" required placeholder="Viết bình luận của bạn..." style="width: 100%; padding: 12px 16px; border: 1px solid #dcdde1; border-radius: 8px; font-size: 14px; outline: none; box-sizing: border-box;" />
+                        <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                            <button type="button" id="cancelEditCommentBtn" style="display: none; padding: 8px 16px; background: #718093; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">Hủy</button>
+                            <button type="submit" id="submitCommentBtn" style="padding: 8px 20px; background: #e67e22; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">Gửi</button>
+                        </div>
+                    </div>
+                </form>
 
-            <form id="commentForm" class="comment-form is-hidden">
-                <input type="hidden" id="editingCommentId" value="" />
-                <input type="text" id="commentInput" required placeholder="Viết bình luận của bạn..." class="comment-input" />
-                <button type="submit" id="submitCommentBtn" class="btn-submit-comment">Gửi</button>
-                <button type="button" id="cancelEditCommentBtn" class="btn-cancel-comment is-hidden">Hủy</button>
-            </form>
+                <div id="commentsList" style="display: flex; flex-direction: column; gap: 12px;"></div>
+            </section>
         </div>
     </div>
 

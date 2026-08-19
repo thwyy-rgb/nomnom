@@ -33,20 +33,27 @@ const auth = getAuth(app);
 
 let currentUser = null;
 let activePostId = null;
-let unsubscribeComments = null;
 
 const urlParams = new URLSearchParams(window.location.search);
 activePostId = urlParams.get("id");
 
 onAuthStateChanged(auth, (user) => {
+  const commentForm = document.getElementById("commentForm");
+  const commentAuthWarning = document.getElementById("commentAuthWarning");
+  const currentUserAvatar = document.getElementById("currentUserAvatar");
+
   if (user) {
     currentUser = user;
-    document.getElementById("commentForm").style.display = "flex";
-    document.getElementById("commentAuthWarning").style.display = "none";
+    if (commentForm) commentForm.style.display = "flex";
+    if (commentAuthWarning) commentAuthWarning.style.display = "none";
+    if (currentUserAvatar) {
+      currentUserAvatar.src =
+        user.photoURL || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+    }
   } else {
     currentUser = null;
-    document.getElementById("commentForm").style.display = "none";
-    document.getElementById("commentAuthWarning").style.display = "block";
+    if (commentForm) commentForm.style.display = "none";
+    if (commentAuthWarning) commentAuthWarning.style.display = "block";
   }
 
   if (activePostId) {
@@ -102,10 +109,8 @@ async function loadPostDetail(postId) {
     const post = postSnap.data();
     document.title = `${post.foodName} - NomNom`;
 
-    // Kiểm tra chính chủ bài viết
     const isPostOwner = post.userId === currentUser?.uid;
 
-    // Ưu tiên thông tin Auth nếu là tác giả bài viết
     const authorAvatar = isPostOwner
       ? currentUser?.photoURL ||
         "https://cdn-icons-png.flaticon.com/512/3177/3177440.png"
@@ -119,15 +124,14 @@ async function loadPostDetail(postId) {
     let detailHTML = `
       <h1 style="font-size: 24px; font-weight: 800; color: #1e272e; margin-bottom: 12px;">${post.foodName}</h1>
       <div id="postAuthorInfo" style="display:flex; align-items:center; gap:10px; margin-bottom: 16px; ${isPostOwner ? "cursor:pointer;" : ""}" title="${isPostOwner ? "Bấm để chỉnh sửa trang cá nhân" : ""}">
-        <img src="${authorAvatar}" class="author-avatar">
+        <img src="${authorAvatar}" class="author-avatar" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
         <div>
             <div style="font-weight:700; font-size:14px; color:#2f3542;">Đăng bởi: ${authorName}</div>
             <div style="font-size:12px; color:#718093;">Phân loại: ${post.postType === "recipe" ? "Công thức nấu ăn" : "Review quán ăn"}</div>
         </div>
       </div>
-      ${post.foodImageUrl ? `<img src="${post.foodImageUrl}" class="detail-banner">` : ""}
+      ${post.foodImageUrl ? `<img src="${post.foodImageUrl}" class="detail-banner" style="width: 100%; border-radius: 12px; max-height: 400px; object-fit: cover;">` : ""}
       
-      <!-- Video thành phẩm (nếu có) -->
       ${
         post.foodVideoUrl
           ? `
@@ -139,20 +143,21 @@ async function loadPostDetail(postId) {
           : ""
       }
     `;
+
     if (post.postType === "recipe") {
       detailHTML += `
-        <div class="time-meta-box">
+        <div class="time-meta-box" style="display: flex; gap: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
           <div class="time-meta-item">
-            <div class="meta-label">Chuẩn bị</div>
-            <div class="meta-value">${post.prepTime || "0"} phút</div>
+            <div class="meta-label" style="font-size: 12px; color: #718093;">Chuẩn bị</div>
+            <div class="meta-value" style="font-weight: 700; color: #2f3542;">${post.prepTime || "0"} phút</div>
           </div>
           <div class="time-meta-item">
-            <div class="meta-label">Chế biến</div>
-            <div class="meta-value">${post.cookTime || "0"} phút</div>
+            <div class="meta-label" style="font-size: 12px; color: #718093;">Chế biến</div>
+            <div class="meta-value" style="font-weight: 700; color: #2f3542;">${post.cookTime || "0"} phút</div>
           </div>
           <div class="time-meta-item">
-            <div class="meta-label">Dành cho</div>
-            <div class="meta-value">${post.servingSize || "Nhiều người"}</div>
+            <div class="meta-label" style="font-size: 12px; color: #718093;">Dành cho</div>
+            <div class="meta-value" style="font-weight: 700; color: #2f3542;">${post.servingSize || "Nhiều người"}</div>
           </div>
         </div>
       `;
@@ -161,9 +166,9 @@ async function loadPostDetail(postId) {
         ? post.dynamicInput.split(",")
         : [];
       detailHTML += `
-        <div class="ingredients-card">
-          <h4>Nguyên liệu cần có:</h4>
-          <ul class="ingredients-list">
+        <div class="ingredients-card" style="margin-bottom: 20px;">
+          <h4 style="font-size: 16px; font-weight: 700; color: #2f3542; margin-bottom: 10px;">Nguyên liệu cần có:</h4>
+          <ul class="ingredients-list" style="padding-left: 20px; line-height: 1.6;">
             ${ingredientsArray.map((ing) => `<li>${ing.trim()}</li>`).join("")}
           </ul>
         </div>
@@ -188,17 +193,17 @@ async function loadPostDetail(postId) {
     if (post.postType === "recipe" && post.steps && post.steps.length > 0) {
       detailHTML += `
         <h4 style="font-size:17px; font-weight:700; margin-bottom:15px; color:#1e272e; border-left:4px solid #2ecc71; padding-left:10px;">Các bước chế biến món ăn:</h4>
-        <div class="steps-container">
+        <div class="steps-container" style="display: flex; flex-direction: column; gap: 15px;">
           ${post.steps
             .map((step, idx) => {
               const stepText = typeof step === "object" ? step.text : step;
               const stepVideo = typeof step === "object" ? step.video : "";
 
               return `
-              <div class="step-card-detail" style="display: flex; flex-direction: column; gap: 8px;">
+              <div class="step-card-detail" style="display: flex; flex-direction: column; gap: 8px; background: #fff; border: 1px solid #eee; padding: 12px; border-radius: 8px;">
                 <div style="display: flex; gap: 15px; align-items: flex-start;">
-                  <span class="step-badge">Bước ${idx + 1}</span>
-                  <div class="step-content-detail" style="flex: 1;">${stepText}</div>
+                  <span class="step-badge" style="background: #2ecc71; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; flex-shrink: 0;">Bước ${idx + 1}</span>
+                  <div class="step-content-detail" style="flex: 1; font-size: 14px; color: #2d3436;">${stepText}</div>
                 </div>
                 ${
                   stepVideo
@@ -219,7 +224,6 @@ async function loadPostDetail(postId) {
 
     document.getElementById("viewPostDetailArea").innerHTML = detailHTML;
 
-    // Gán sự kiện chuyển sang trang trang cá nhân nếu click vào tác giả
     const postAuthorInfo = document.getElementById("postAuthorInfo");
     if (postAuthorInfo && isPostOwner) {
       postAuthorInfo.addEventListener("click", () => {
@@ -235,12 +239,16 @@ function listenToComments(postId) {
   const q = query(
     collection(db, "comments"),
     where("postId", "==", postId),
-    orderBy("createdAt", "asc"),
+    orderBy("createdAt", "asc")
   );
 
-  unsubscribeComments = onSnapshot(q, (snapshot) => {
+  onSnapshot(q, (snapshot) => {
     const commentsList = document.getElementById("commentsList");
-    document.getElementById("commentCount").innerText = snapshot.size;
+    const commentCount = document.getElementById("commentCount");
+    
+    if (commentCount) commentCount.innerText = snapshot.size;
+    if (!commentsList) return;
+    
     commentsList.innerHTML = "";
 
     if (snapshot.empty) {
@@ -252,7 +260,6 @@ function listenToComments(postId) {
       const comment = { id: docSnap.id, ...docSnap.data() };
       const isCommentOwner = comment.userId === currentUser?.uid;
 
-      // Ưu tiên thông tin Auth nếu là chủ bình luận
       const commentAvatar = isCommentOwner
         ? currentUser?.photoURL ||
           "https://cdn-icons-png.flaticon.com/512/3177/3177440.png"
@@ -287,7 +294,6 @@ function listenToComments(postId) {
       `;
 
       if (isCommentOwner) {
-        // Chuyển sang edit-profile khi bấm vào avatar/tên trong cmt
         const cmtAvatarEl = commentNode.querySelector(".comment-avatar");
         const cmtNameEl = commentNode.querySelector(".comment-username");
 
@@ -353,10 +359,11 @@ if (commentForm) {
           text: text,
           createdAt: Date.now(),
         });
+        showToast("Đăng bình luận thành công!");
       }
       resetCommentForm();
     } catch (err) {
-      console.error(err);
+      console.error("Lỗi bình luận:", err);
       showToast("Lỗi gửi bình luận!", "danger");
     }
   });

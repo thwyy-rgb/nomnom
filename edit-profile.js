@@ -4,6 +4,15 @@ import {
   onAuthStateChanged,
   updateProfile,
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+  writeBatch,
+  doc,
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDQCed1Led55t9s8deU1BZSpkVe1oSt-oU",
@@ -17,12 +26,14 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 const CLOUDINARY_CLOUD_NAME = "dnurk6t58";
 const CLOUDINARY_UPLOAD_PRESET = "uniqblfi";
+const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
 
-const profileLoading = document.getElementById("profileLoading"); 
-const profileForm = document.getElementById("editProfileForm"); 
+const profileLoading = document.getElementById("profileLoading");
+const profileForm = document.getElementById("editProfileForm");
 const editNameInput = document.getElementById("editDisplayName");
 const editAvatarInput = document.getElementById("editAvatarUrl");
 const avatarPreview = document.getElementById("avatarPreview");
@@ -37,7 +48,7 @@ onAuthStateChanged(auth, (user) => {
     if (editNameInput) editNameInput.value = user.displayName || "";
     if (editAvatarInput) editAvatarInput.value = user.photoURL || "";
     if (avatarPreview) {
-      avatarPreview.src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+      avatarPreview.src = user.photoURL || DEFAULT_AVATAR;
     }
 
     if (profileLoading) profileLoading.style.display = "none";
@@ -48,8 +59,18 @@ onAuthStateChanged(auth, (user) => {
 if (editAvatarInput) {
   editAvatarInput.addEventListener("input", (e) => {
     const url = e.target.value.trim();
-    if (url && avatarPreview) {
-      avatarPreview.src = url;
+    if (avatarPreview) {
+      avatarPreview.src = url || auth.currentUser?.photoURL || DEFAULT_AVATAR;
+    }
+  });
+}
+
+if (avatarPreview) {
+  avatarPreview.addEventListener("error", () => {
+    avatarPreview.src = auth.currentUser?.photoURL || DEFAULT_AVATAR;
+    if (uploadStatus) {
+      uploadStatus.innerText = "Link ảnh không hợp lệ!";
+      uploadStatus.style.color = "#ff4d4f";
     }
   });
 }
@@ -60,7 +81,7 @@ if (avatarFileInput) {
     if (!file) return;
 
     if (uploadStatus) {
-      uploadStatus.innerText = "Đang tải ảnh lên Cloudinary...";
+      uploadStatus.innerText = "Đang tải ảnh lên...";
       uploadStatus.style.color = "#27ae60";
     }
 
@@ -69,10 +90,13 @@ if (avatarFileInput) {
     formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
 
     try {
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
-        method: "POST",
-        body: formData,
-      });
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
       const data = await res.json();
 
       if (data.secure_url) {
@@ -83,12 +107,12 @@ if (avatarFileInput) {
           uploadStatus.style.color = "#2ecc71";
         }
       } else {
-        throw new Error("Lỗi tải ảnh");
+        throw new Error("Tải ảnh thất bại");
       }
     } catch (err) {
       console.error(err);
       if (uploadStatus) {
-        uploadStatus.innerText = "Lỗi tải ảnh!";
+        uploadStatus.innerText = "Lỗi khi tải ảnh lên!";
         uploadStatus.style.color = "#ff4d4f";
       }
     }
@@ -98,28 +122,64 @@ if (avatarFileInput) {
 if (profileForm) {
   profileForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    if (!auth.currentUser) return;
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const newName = editNameInput.value.trim();
+    const inputAvatarUrl = editAvatarInput.value.trim();
+
+    const newAvatar = inputAvatarUrl || user.photoURL || DEFAULT_AVATAR;
 
     try {
       if (btnSaveProfile) {
         btnSaveProfile.disabled = true;
-        btnSaveProfile.innerText = "Đang lưu...";
+        btnSaveProfile.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Đang lưu...`;
       }
 
-      await updateProfile(auth.currentUser, {
-        displayName: editNameInput.value.trim(),
-        photoURL: editAvatarInput.value.trim(),
+      await updateProfile(user, {
+        displayName: newName,
+        photoURL: newAvatar,
       });
+
+      await updateUserContentInFirestore(user.uid, newName, newAvatar);
 
       alert("Cập nhật trang cá nhân thành công!");
       window.location.href = "index.html";
     } catch (err) {
-      console.error(err);
+      console.error("Lỗi cập nhật profile:", err);
       alert("Không thể cập nhật hồ sơ!");
       if (btnSaveProfile) {
         btnSaveProfile.disabled = false;
-        btnSaveProfile.innerText = "Lưu thay đổi";
+        btnSaveProfile.innerHTML = `<i class="fas fa-save"></i> Lưu thay đổi`;
       }
     }
   });
+}
+
+async function updateUserContentInFirestore(uid, newName, newAvatar) {
+  try {
+    const batch = writeBatch(db);
+
+    const postsQuery = query(collection(db, "posts"), where("userId", "==", uid));
+    const postsSnap = await getDocs(postsQuery);
+    postsSnap.forEach((docSnap) => {
+      batch.update(doc(db, "posts", docSnap.id), {
+        userName: newName,
+        userAvatar: newAvatar,
+      });
+    });
+
+    const commentsQuery = query(collection(db, "comments"), where("userId", "==", uid));
+    const commentsSnap = await getDocs(commentsQuery);
+    commentsSnap.forEach((docSnap) => {
+      batch.update(doc(db, "comments", docSnap.id), {
+        userName: newName,
+        userAvatar: newAvatar,
+      });
+    });
+
+    await batch.commit();
+  } catch (err) {
+    console.warn("Lỗi đồng bộ bài viết/bình luận cũ:", err);
+  }
 }
