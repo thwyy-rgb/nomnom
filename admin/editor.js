@@ -117,7 +117,6 @@ window.addBlock = function(type, initialData = {}) {
   }
 }
 
-// Kết nối Cloudinary Upload
 async function uploadToCloudinary(file) {
   const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
   const formData = new FormData();
@@ -194,7 +193,6 @@ function collectBlocksData() {
   return blocks;
 }
 
-// Lưu lên Firestore
 async function savePost(status) {
   const title = document.getElementById('postTitle').value.trim();
   const summary = document.getElementById('postSummary').value.trim();
